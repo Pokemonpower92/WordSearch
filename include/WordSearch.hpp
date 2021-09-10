@@ -18,6 +18,7 @@ private:
     bool findVacancies(const std::string& word);
     bool fitWord(std::pair<size_t, size_t> index, char orient, const std::string& word);
     bool placeWord(std::pair<size_t, size_t> index, const std::string& word);
+    void fillGrid();
     void printMaps() const;
 
 public:

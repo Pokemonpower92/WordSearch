@@ -40,7 +40,7 @@ WordSearch::WordSearch(size_t size, std::vector<std::string> words)
         this->wordMap.insert(make_pair(this->words[i], NULL));
     }
 
-    this->grid.resize(this->size, string(this->size, ' '));
+    this->grid.resize(this->size, string(this->size, '-'));
     this->vacancies.resize((this->size), vector<int>(this->size, 1));
 }
 
@@ -188,6 +188,18 @@ void WordSearch::printMaps() const
     }
 }
 
+// Fill the vacant indicies with random characters.
+void WordSearch::fillGrid()
+{
+    for (size_t i = 0; i < this->vacancies.size(); i++) {
+        for (size_t j = 0; j < this->vacancies[i].size(); j++) {
+            if (this->vacancies[i][j]) {
+                this->grid[i][j] = 'A' + (rand() % 26);
+            }
+        }
+    }
+}
+
 // ########### Accessors
 size_t WordSearch::getSize() const
 {
@@ -244,4 +256,6 @@ void WordSearch::makeGrid()
 
         this->wordMap.erase(randomWord);
     }
+
+    this->fillGrid();
 }

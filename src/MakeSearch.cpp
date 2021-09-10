@@ -27,6 +27,16 @@ size_t checkSize(int argc, char** argv)
     return size;
 }
 
+void uppercaseWords(vector<string>& words)
+{
+
+    for (size_t i = 0; i < words.size(); i++) {
+        for (size_t j = 0; j < words[i].size(); j++) {
+            words[i][j] = toupper(words[i][j]);
+        }
+    }
+}
+
 vector<string> readWords()
 {
     vector<string> ret;
@@ -35,6 +45,8 @@ vector<string> readWords()
     while (cin >> word) {
         ret.push_back(word);
     }
+
+    uppercaseWords(ret);
 
     return ret;
 }
@@ -49,34 +61,24 @@ int main(int argc, char** argv)
     try {
         size = checkSize(argc, argv);
         ws = WordSearch(size, words);
-
-        cout << "Size: ";
-        cout << ws.getSize() << endl;
-
-        words = ws.getWords();
-        cout << "Words: " << endl;
-        for (int i = 0; i != words.size(); i++) {
-            cout << "\t" << words[i] << endl;
-        }
-
-        grid = ws.getGrid();
-        cout << "Grid: " << endl;
-        for (int i = 0; i != grid.size(); i++) {
-            cout << grid[i] << endl;
-        }
-
         ws.makeGrid();
 
         grid = ws.getGrid();
-        cout << "Grid: " << endl;
-        for (int i = 0; i != grid.size(); i++) {
-            cout << grid[i] << endl;
+        for (size_t i = 0; i != grid.size(); i++) {
+            cout << "\t";
+            for (size_t j = 0; j < grid[i].size() - 1; j++) {
+                cout << grid[i][j] << " ";
+            }
+            cout << grid[i][grid[i].size() - 1] << endl;
         }
 
     } catch (invalid_argument& err) {
         cout << "Invalid arguments specified." << endl;
         cout << err.what() << endl;
         usage();
+        return -1;
+    } catch (runtime_error& err) {
+        cout << err.what() << endl;
         return -1;
     }
 
