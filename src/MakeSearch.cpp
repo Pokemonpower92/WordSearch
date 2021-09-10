@@ -43,6 +43,7 @@ int main(int argc, char** argv)
 {
     size_t size;
     vector<string> words = readWords();
+    vector<string> grid;
     WordSearch ws;
 
     try {
@@ -56,6 +57,20 @@ int main(int argc, char** argv)
         cout << "Words: " << endl;
         for (int i = 0; i != words.size(); i++) {
             cout << "\t" << words[i] << endl;
+        }
+
+        grid = ws.getGrid();
+        cout << "Grid: " << endl;
+        for (int i = 0; i != grid.size(); i++) {
+            cout << grid[i] << endl;
+        }
+
+        ws.makeGrid();
+
+        grid = ws.getGrid();
+        cout << "Grid: " << endl;
+        for (int i = 0; i != grid.size(); i++) {
+            cout << grid[i] << endl;
         }
 
     } catch (invalid_argument& err) {

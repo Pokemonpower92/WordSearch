@@ -1,12 +1,14 @@
 #include "WordSearch.hpp"
 #include <cstdio>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 #include <unordered_map>
 #include <vector>
 
 using namespace std;
 
-// Constructors.
+// ########### Constructors.
 WordSearch::WordSearch()
 {
     this->size = 0;
@@ -16,6 +18,8 @@ WordSearch::WordSearch()
 WordSearch::WordSearch(size_t size, std::vector<std::string> words)
 {
     int maxWordSize = 0;
+
+    srand(time(NULL));
 
     // See if the largest word will fit in the grid.
     for (size_t i = 0; i < words.size(); i++) {
@@ -30,50 +34,161 @@ WordSearch::WordSearch(size_t size, std::vector<std::string> words)
 
     this->size = size;
     this->words = words;
-    this->makeMaps();
-}
 
-// Helpers
-// Make the mapes for availible words
-// and indecies.
-void WordSearch::makeMaps()
-{
-    size_t index;
-
-    // wordMap.
+    // Initialize the wordMap and the grid.
     for (size_t i = 0; i < this->words.size(); i++) {
-        this->wordMap.insert(make_pair(i, this->words[i]));
+        this->wordMap.insert(make_pair(this->words[i], NULL));
     }
 
-    // indexMap
+    this->grid.resize(this->size, string(this->size, ' '));
+    this->vacancies.resize((this->size), vector<int>(this->size, 1));
+}
+
+// ########### Helpers
+
+// Make the map for the availible starting indices
+// for word. If there were no vacancies this method returns
+// false.
+bool WordSearch::findVacancies(const string& word)
+{
+    int counter = 0;
+
+    this->startingPlaces.clear();
+
     for (size_t i = 0; i < this->size; i++) {
         for (size_t j = 0; j < this->size; j++) {
-            index = i * size + j;
-            this->indexMap.insert(make_pair(index, NULL));
+            if (this->vacancies[i][j] || grid[i][j] == word[0]) {
+                this->startingPlaces.push_back(make_pair(i, j));
+            }
         }
     }
+
+    return this->startingPlaces.size() != 0;
 }
 
-void WordSearch::printMaps()
+// Can a word fit in the grid with starting spot index with the given oreintation.
+bool WordSearch::fitWord(pair<size_t, size_t> index, char orient, const string& word)
+{
+    size_t row = index.first;
+    size_t col = index.second;
+    bool flag = false;
+
+    switch (orient) {
+    case 'v':
+        // If there's enough room in general.
+        if ((this->size - row) < word.size())
+            break;
+
+        // See if all the spaces are either vacant or match the word.
+        for (size_t i = row; i < row + word.size(); i++) {
+            if (!this->vacancies[i][col] && this->grid[i][col] != word[i - row]) {
+                flag = true;
+            }
+        }
+
+        if (flag)
+            break;
+
+        // Place the word.
+        for (size_t i = row; i < row + word.size(); i++) {
+            this->grid[i][col] = word[i - row];
+            this->vacancies[i][col] = 0;
+        }
+
+        return true;
+    case 'h':
+        // If there's enough room in general.
+        if ((this->size - col) < word.size())
+            break;
+
+        // See if all the spaces are either vacant or match the word.
+        for (size_t i = col; i < col + word.size(); i++) {
+            if (!this->vacancies[row][i] && this->grid[row][i] != word[i - col]) {
+                flag = true;
+            }
+        }
+
+        if (flag)
+            break;
+
+        // Place the word.
+        for (size_t i = col; i < col + word.size(); i++) {
+            this->grid[row][i] = word[i - col];
+            this->vacancies[row][i] = 0;
+        }
+
+        return true;
+    case 'd':
+        // If there's enough room in general.
+        if ((this->size - col) < word.size() || (this->size - row) < word.size())
+            break;
+
+        // See if all the spaces are either vacant or match the word.
+        size_t j = row;
+        for (size_t i = col; i < col + word.size(); i++) {
+            if (!this->vacancies[j][i] && this->grid[j][i] != word[i - col]) {
+                flag = true;
+            }
+            j++;
+        }
+
+        if (flag)
+            break;
+
+        // Place the word.
+        j = row;
+        for (size_t i = col; i < col + word.size(); i++) {
+            this->grid[j][i] = word[i - col];
+            this->vacancies[j][i] = 0;
+            j++;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+// Try to place the word at the starting place index for a random oreintation.
+// Try all oreintations in a random order until one works.
+// If one works place the word in the grid and return true.
+// If all orientations are exhausted then return false.
+bool WordSearch::placeWord(pair<size_t, size_t> index, const string& word)
+{
+    // v=vertical; h=horizontal; d=diagonal
+    vector<char> orientations = { 'v', 'h', 'd' };
+    size_t randomIndex;
+
+    while (orientations.size()) {
+        randomIndex = rand() % orientations.size();
+
+        if (this->fitWord(index, orientations[randomIndex], word)) {
+            return true;
+        } else {
+            orientations.erase(orientations.begin() + randomIndex);
+        }
+    }
+
+    return false;
+}
+
+void WordSearch::printMaps() const
 {
     size_t i, j;
 
     cout << "Words:" << endl;
     for (auto mit = this->wordMap.begin(); mit != this->wordMap.end(); mit++) {
-        printf("\tNumber: %ld, ", mit->first);
-        printf("\tWord: %2s\n", mit->second.c_str());
+        printf("\tWord: %2s\n", mit->first.c_str());
     }
 
     cout << "Free indices: " << endl;
-    for (auto mit = this->indexMap.begin(); mit != this->indexMap.end(); mit++) {
-        j = mit->first % this->size;
-        i = (mit->first - j) / this->size;
-
-        printf("\t%ld, %ld\n", i, j);
+    for (size_t i = 0; i < this->startingPlaces.size(); i++) {
+        cout << "i: " << this->startingPlaces[i].first << ", ";
+        cout << "j: " << this->startingPlaces[i].second << endl;
     }
 }
 
-// Accessors
+// ########### Accessors
 size_t WordSearch::getSize() const
 {
     return this->size;
@@ -92,4 +207,41 @@ std::vector<std::string> WordSearch::getGrid() const
 // Makes the grid. Throws something on failures.
 void WordSearch::makeGrid()
 {
+    string word;
+    size_t randomIndex;
+    bool placed;
+    pair<size_t, size_t> startingSpot;
+
+    // Pull a random word off the wordMap
+    // And place it into the grid randomly
+    // until there are no more words.
+    while (this->wordMap.size()) {
+        auto randomWord = this->wordMap.begin();
+        advance(randomWord, rand() % this->wordMap.size());
+        word = randomWord->first;
+        placed = false;
+
+        // Find all possible starting indices
+        if (!this->findVacancies(word)) {
+            throw runtime_error("Couldn't add word: " + word);
+        }
+
+        while (this->startingPlaces.size()) {
+            randomIndex = rand() % this->startingPlaces.size();
+            startingSpot = this->startingPlaces[randomIndex];
+
+            if (this->placeWord(startingSpot, word)) {
+                placed = true;
+                break;
+            } else {
+                this->startingPlaces.erase(this->startingPlaces.begin() + randomIndex);
+            }
+        }
+
+        if (!placed) {
+            throw runtime_error("Couldn't place word: " + word);
+        }
+
+        this->wordMap.erase(randomWord);
+    }
 }

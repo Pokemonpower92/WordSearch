@@ -1,2 +1,4 @@
-obj/*.0
+obj/*.o
 bin/MakeSearch
+.vscode
+.vscode/*
