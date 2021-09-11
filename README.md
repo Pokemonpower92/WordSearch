@@ -92,7 +92,8 @@ The solution will be stored as jgraph in a file that is named whatever is assign
 Let's see an example of that:
 
 ```
-UNIX> ~/School/WordSearch$ head exampleSolution.jgr
+UNIX>  echo "Here" "are" "some"" words" | ./bin/MakeSearch -s 10 -a exampleSolution.jgr > example.jgr
+UNIX>  head exampleSolution.jgr
 newgraph
         y_translate 4.0
         xaxis nodraw min 0 max 10 size 6
