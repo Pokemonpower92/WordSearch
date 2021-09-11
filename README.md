@@ -114,5 +114,5 @@ UNIX> jgraph -P exampleSolution.jgr | ps2pdf - | convert -density 300 - -quality
 
 Here's the images of our example Word Search and it's solution:
 
-<img src="example.jpg" alt="drawing" width="400" />
-<img src="exampleSolution.jpg" alt="drawing" width="400"/>
+<img src="example.jpg" alt="drawing" width="350" />
+<img src="exampleSolution.jpg" alt="drawing" width="350"/>
