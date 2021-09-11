@@ -1,4 +1,5 @@
 obj/*.o
 bin/MakeSearch
+solutions/*.txt
 .vscode
 .vscode/*
