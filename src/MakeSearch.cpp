@@ -181,7 +181,7 @@ void emitJgraph(const vector<string> &grid,
             {
                 counter++;
             }
-            fprintf(fout, "\tnewstring fontsize 10 hjc vjc x %ld y %d : %s\n",
+            fprintf(fout, "\tnewstring fontsize 13 hjc vjc x %ld y %d : %s\n",
                     (i % 5) * 2,
                     counter,
                     words[i].c_str());
@@ -219,7 +219,7 @@ void emitJgraph(const vector<string> &grid,
         {
             counter++;
         }
-        printf("\tnewstring fontsize 10 hjc vjc x %ld y %d : %s\n",
+        printf("\tnewstring fontsize 13 hjc vjc x %ld y %d : %s\n",
                (i % 5) * 2,
                counter,
                words[i].c_str());

@@ -4,9 +4,10 @@ INCLUDE=include
 BIN = bin/MakeSearch 
 
 all: $(BIN)
+	sh scripts/makeExamples.sh
 
 clean: 
-	rm -f bin/* obj/*
+	rm -f bin/* obj/* jgraph/* solutions/*
 
 obj/WordSearch.o: src/WordSearch.cpp include/WordSearch.hpp
 	$(CC) $(CFLAGS) -I$(INCLUDE) -c -o obj/WordSearch.o src/WordSearch.cpp
